@@ -10,7 +10,7 @@ label_str2num = {'glioma': 0,
                     }
 
 TRAIN_DIR = "Brain-Tumor-Classfication/Training"
-TEST_DIR = "/mlcv2/WorkingSpace/Personal/baotg/brain/Brain-Tumor-Classfication/Testing"
+TEST_DIR = "Brain-Tumor-Classfication/Testing"
 
 BRAIN_TUMOR_PRETRAINED = "Brain-Tumor-Classfication/new_cnn_brain_cass.pt"
 batch_size = 32

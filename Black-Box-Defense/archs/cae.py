@@ -17,7 +17,7 @@ import torch.nn as nn
 class Encoder_Vit_1000(nn.Module):
     def __init__(self):
         super(Encoder_Vit_1000, self).__init__()
-        self.encoder = torch.load("/mlcv2/WorkingSpace/Personal/baotg/brain/Black-Box-Defense/cass-r50-isic.pt", 
+        self.encoder = torch.load("Black-Box-Defense/cass-r50-isic.pt", 
                                   map_location=torch.device("cuda:0"))
     
     def forward(self, x):
