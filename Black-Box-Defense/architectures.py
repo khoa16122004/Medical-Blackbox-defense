@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 import sys
-sys.path.append("/mlcv2/WorkingSpace/Personal/baotg/Khoatn/Black-Box-Defense/archs")
+sys.path.append("Black-Box-Defense/archs")
 
 from archs.cifarnet import CifarNet
 from archs.tiny_resnet import TinyResNet50, TinyResNet18

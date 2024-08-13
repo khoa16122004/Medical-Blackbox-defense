@@ -61,7 +61,7 @@ parser.add_argument('--decoder_arch', type=str, default='Decoder_1000', choices=
 parser.add_argument('--classifier', default='cass_classifier', type=str,
                     help='path to the classifier used with the `classificaiton`'
                          'or `stability` objectives of the denoiser.')
-parser.add_argument('--pretrained-denoiser', default='/mlcv2/WorkingSpace/Personal/baotg/brain/Black-Box-Defense/experiment/Brain_Recon_MSE_0.25/best_denoiser.pth', type=str, help='path to a pretrained denoiser')
+parser.add_argument('--pretrained-denoiser', default='Black-Box-Defense/experiment/Brain_Recon_MSE_0.25/best_denoiser.pth', type=str, help='path to a pretrained denoiser')
 parser.add_argument('--pretrained-encoder', default='', type=str, help='path to a pretrained encoder')
 parser.add_argument('--pretrained-decoder', default='', type=str, help='path to a pretrained decoder')
 
