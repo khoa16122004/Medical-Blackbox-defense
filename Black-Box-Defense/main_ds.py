@@ -135,9 +135,9 @@ def main():
         test_dataset = get_dataset(args.dataset, 'Test')
 
         train_loader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch,
-                                   pin_memory=pin_memory)
+                                   pin_memory=pin_memory, num_workers=args.batch)
         test_loader = DataLoader(test_dataset, shuffle=False, batch_size=args.batch,
-                                  pin_memory=pin_memory)
+                                  pin_memory=pin_memory, num_workers=args.batch)
     
     elif args.dataset == 'restricted_imagenet':
         in_path = '/localscratch2/damondemon/datasets/imagenet'
