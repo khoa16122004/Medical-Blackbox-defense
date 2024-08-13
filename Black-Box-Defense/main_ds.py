@@ -463,12 +463,12 @@ def train(loader: DataLoader, denoiser: torch.nn.Module,
         batch_time.update(time.time() - end)
         end = time.time()
 
-        # if i % args.print_freq == 0:
-            # print('Epoch: [{0}][{1}/{2}]\t'
-                #   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                #   'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'.format(
-                #       epoch, i, len(loader), batch_time=batch_time,
-                #       data_time=data_time, loss=losses))
+        if i % args.print_freq == 0:
+            print('Epoch: [{0}][{1}/{2}]\t'
+                  'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                  'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'.format(
+                      epoch, i, len(loader), batch_time=batch_time,
+                      data_time=data_time, loss=losses))
 
     return losses.avg
 
