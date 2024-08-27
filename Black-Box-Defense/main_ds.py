@@ -810,22 +810,24 @@ def test_with_classifier_ae(loader: DataLoader, encoder: torch.nn.Module, decode
             # measure accuracy and record loss
             acc1 = accuracy(outputs, targets)
             losses.update(loss_mean.item(), inputs.size(0))
-            top1.update(acc1.item(), inputs.size(0))
-            top5.update(acc5.item(), inputs.size(0))
+            top1.update(acc1[0].item(), inputs.size(0))
+            # top5.update(acc5.item(), inputs.size(0))
 
             # measure elapsed time
             batch_time.update(time.time() - end)
             end = time.time()
 
             if i % print_freq == 0:
-                log = 'Test: [{0}/{1}]\t'' \
-                ''Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'' \
-                ''Data {data_time.val:.3f} ({data_time.avg:.3f})\t'' \
-                ''Loss {loss.val:.4f} ({loss.avg:.4f})\t'' \
-                ''Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'' \
-                ''Acc@5 {top5.val:.3f} ({top5.avg:.3f})\n'.format(
-                    i, len(loader), batch_time=batch_time,
-                    data_time=data_time, loss=losses, top1=top1, top5=top5)
+                log = f"Test: [{i}/{len(loader)}\t Time {batch_time.val:.3f} {batch_time.avg:.3f} \t Data {data_time.val:.3f} {data_time.avg:.3f}\t Loss {losses.val:.4f} {losses.avg:.4f} \t Acc@1 {top1.val:.3f} {top1.avg:.3f}\n"
+
+                # log = 'Test: [{0}/{1}]\t'' \
+                # ''Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'' \
+                # ''Data {data_time.val:.3f} ({data_time.avg:.3f})\t'' \
+                # ''Loss {loss.val:.4f} ({loss.avg:.4f})\t'' \
+                # ''Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'' \
+                # ''Acc@5 {top5.val:.3f} ({top5.avg:.3f})\n'.format(
+                #     i, len(loader), batch_time=batch_time,
+                #     data_time=data_time, loss=losses, top1=top1, top5=top5)
 
                 print(log)
 
