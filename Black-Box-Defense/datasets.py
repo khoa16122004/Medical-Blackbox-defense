@@ -44,10 +44,10 @@ def get_dataset(dataset: str, split: str) -> Dataset:
     
     elif dataset == "SIPADMEK":
         if split == "Train":
-            return SIPADMEK(img_dir="Dataset\SIPADMEK\process",
+            return SIPADMEK(img_dir=r"Dataset\SIPADMEK\process",
                             mode=split)
         else:
-            return SIPADMEK(img_dir="Dataset\SIPADMEK\process",
+            return SIPADMEK(img_dir=r"Dataset\SIPADMEK\process",
                             mode=split,
                             transform=transforms.Compose([transforms.Resize((384, 384)), 
                                                         transforms.ToTensor()])
