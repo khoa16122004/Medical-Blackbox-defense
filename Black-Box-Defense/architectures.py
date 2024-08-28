@@ -42,7 +42,7 @@ CIFAR10_CLASSIFIERS = [
                         'stl10_resnet18', 'cifar_wrn_28_4'
                         ]
 
-MRI_RECON = ['vrnet', 'cass_classifier']
+MRI_RECON = ['vrnet', 'cass_classifier', 'vit_sipadmek']
 
 CLASSIFIERS_ARCHITECTURES = IMAGENET_CLASSIFIERS + CIFAR10_CLASSIFIERS + MRI_RECON + MNIST_CLASSIFIERS
 
@@ -86,10 +86,17 @@ def get_architecture(arch: str, dataset: str, pytorch_pretrained: bool=False) ->
     """
     ## ImageNet classifiers
     
+    
+    
+    
     if arch == "cass_classifier" and dataset == "Brain_Tumor":
         return torch.load(checkpoint_path, map_location=torch.device("cuda:0"))
 
-    if arch == "Encoder_Vit_1000" and dataset == "Brain_Tumor": # 256
+    elif arch == "vit_sipadmek" and dataset == "SIPADMEK":
+        return torch.load(r"best_sipadmek.pth", 
+                          map_location=torch.device("cuda:0"))
+    
+    elif arch == "Encoder_Vit_1000" and dataset == "Brain_Tumor": # 256
         return Encoder_Vit_1000().cuda()
     elif arch == "Decoder_Vit_1000" and dataset == "Brain_Tumor": # 256
         return Decoder_Vit_1000().cuda()

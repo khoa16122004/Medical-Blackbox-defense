@@ -35,7 +35,7 @@ parser.add_argument('--dataset', type=str, default="Brain_Tumor", choices=DATASE
 parser.add_argument('--data_min', default=-2.5090184, type=float, help='minimum value of training data')
 parser.add_argument('--data_max', default=3.3369503, type=float, help='maximum value of training data')
 
-parser.add_argument('--batch', default=16, type=int, metavar='N', help='batchsize (default: 256)')
+parser.add_argument('--batch', default=2, type=int, metavar='N', help='batchsize (default: 256)')
 parser.add_argument('--measurement', default=576, type=int, metavar='N', help='the size of measurement for image reconstruction')
 
 
@@ -58,10 +58,10 @@ parser.add_argument('--model_type', default='DS', type=str,
 parser.add_argument('--arch', type=str, default="imagenet_dncnn", choices=DENOISERS_ARCHITECTURES)
 parser.add_argument('--encoder_arch', type=str, default='Encoder_1000', choices=AUTOENCODER_ARCHITECTURES)
 parser.add_argument('--decoder_arch', type=str, default='Decoder_1000', choices=AUTOENCODER_ARCHITECTURES)
-parser.add_argument('--classifier', default='cass_classifier', type=str,
+parser.add_argument('--classifier', default='vit_sipadmek', type=str,
                     help='path to the classifier used with the `classificaiton`'
                          'or `stability` objectives of the denoiser.')
-parser.add_argument('--pretrained-denoiser', default='Black-Box-Defense/experiment/Brain_Recon_MSE_0.25/best_denoiser.pth', type=str, help='path to a pretrained denoiser')
+parser.add_argument('--pretrained-denoiser', default='', type=str, help='path to a pretrained denoiser')
 parser.add_argument('--pretrained-encoder', default='', type=str, help='path to a pretrained encoder')
 parser.add_argument('--pretrained-decoder', default='', type=str, help='path to a pretrained decoder')
 
@@ -71,7 +71,7 @@ parser.add_argument('--train_method', default='part', type=str,
                     choices=['part', 'whole', 'whole_plus'])
 
 # Training Setting
-parser.add_argument('--outdir', type=str, default="experiment/ZO_Brain_CE_fintune_MSE_0.25",help='folder to save denoiser and training log)')
+parser.add_argument('--outdir', type=str, default="experiment/SIPADMEK_CE_0.25",help='folder to save denoiser and training log)')
 parser.add_argument('--workers', default=None, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--optimizer', default='Adam', type=str,
@@ -129,6 +129,15 @@ def main():
 
         train_loader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch, pin_memory=pin_memory)
         test_loader = DataLoader(test_dataset, shuffle=False, batch_size=args.batch, pin_memory=pin_memory)
+
+    
+    elif args.dataset == "SIPADMEK":
+        train_dataset = get_dataset(args.dataset, split="Train")
+        test_dataset = get_dataset(args.dataset, split="Test")
+
+        train_loader = DataLoader(train_dataset, batch_size=args.batch, pin_memory=pin_memory, shuffle=True)
+        test_loader = DataLoader(test_dataset, batch_size=args.batch, pin_memory=pin_memory, shuffle=False)
+        
 
     elif args.dataset == "Brain_Tumor" :
         train_dataset = get_dataset(args.dataset, 'Train')
@@ -188,8 +197,9 @@ def main():
     # c) Classifier / Reconstructor
     if args.train_objective == "classification":
         
-        if args.classifier == "cass_classifier":
+        if args.classifier == "cass_classifier" or args.classifier == "vit_sipadmek":
             clf = get_architecture(args.classifier, args.dataset)
+        
         else:
             checkpoint = torch.load(args.classifier)
             clf = get_architecture(checkpoint['arch'], args.dataset)
