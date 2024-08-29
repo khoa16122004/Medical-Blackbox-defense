@@ -17,10 +17,10 @@ from config import *
 
 parser = argparse.ArgumentParser(description="Image Recontruction")
 
-parser.add_argument('--mode', type=str, default='DS') # ["CLF", 'AE_DS', 'DS', 'infer_AE_DS', 'infer_DS']
+parser.add_argument('--mode', type=str, default='infer_DS') # ["CLF", 'AE_DS', 'DS', 'infer_AE_DS', 'infer_DS']
 parser.add_argument('--dataset', type=str, choices=DATASETS, default="Brain_Tumor")
 parser.add_argument('--batch', default=32 , type=int)
-parser.add_argument('--classifier', default='cass_classifier', type=str,
+parser.add_argument('--classifier', default='vit_sipadmek', type=str,
                     help='path to the classifier used with the `classificaiton`'
                          'or `stability` objectives of the denoiser.')
 parser.add_argument('--encoder_arch', type=None, default="Encoder_Vit_1000")
@@ -32,7 +32,7 @@ parser.add_argument('--arch', type=str, default="cifar_dncnn_wide")
 parser.add_argument('--decoder_arch', type=None, default="Decoder_Vit_1000")
 parser.add_argument('--pretrained_encoder', type=str, default=None)
 parser.add_argument('--pretrained_decoder', type=str, default=None)
-parser.add_argument('--out_dir', type=str, default="Brain_Recontruction_Vit_1000")
+parser.add_argument('--out_dir', type=str, default="experiment\SIPADMEK_CE_0.25")
 parser.add_argument('--img_path', type=str, default=None)
 
 
@@ -136,6 +136,7 @@ def main():
         print(denoiser.load_state_dict(checkpoint['state_dict']))
 
     # classifier
+    print(args.classifier)
     model = get_architecture(args.classifier, args.dataset)
     # checkpoint = torch.load(args.classifier)
     # print(checkpoint['arch'])

@@ -164,7 +164,7 @@ def main():
     #     # assert checkpoint['arch'] == args.arch
     #     denoiser = get_architecture(checkpoint['arch'], args.dataset)
     #     denoiser.load_state_dict(checkpoint['state_dict'])
-    denoiser = torch.load(args.pretrained_denoiser)
+    # denoiser = torch.load(args.pretrained_denoiser)
 
     # optimizer
     optimizer = Adam(denoiser.parameters(), lr=args.lr, weight_decay=args.weight_decay)
