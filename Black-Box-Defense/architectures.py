@@ -90,7 +90,7 @@ def get_architecture(arch: str, dataset: str, pytorch_pretrained: bool=False) ->
     
     print(arch)
     if arch == "cass_classifier" and dataset == "Brain_Tumor":
-        return torch.load(checkpoint_path, map_location=torch.device("cuda:0"))
+        return torch.load("new_cnn_brain_cass.pt", map_location=torch.device("cuda:0"))
 
     elif arch == "vit_sipadmek" and dataset == "SIPADMEK":
         return torch.load(r"best_sipadmek.pth", 

@@ -69,8 +69,16 @@ def get_dataset(dataset: str, split: str) -> Dataset:
 
 def get_num_classes(dataset: str):
     """Return the number of classes in the dataset. """
+    
+    
     if dataset == "imagenet":
         return 1000
+    
+    elif dataset == "Brain_Tumor":
+        return 4
+    elif dataset == "SIPADMEK":
+        return 3
+    
     elif dataset == "stl10":
         return 10
     elif dataset == "cifar10":
@@ -234,9 +242,9 @@ class BrainTumorDataset(Dataset):
         labels = []
         
         if mode == "Train" or mode == "Val":
-            img_dir = TRAIN_DIR
+            img_dir = "Dataset/Brain_Tumor/Training"
         elif mode == "Test":
-            img_dir = TEST_DIR
+            img_dir = "Dataset/Brain_Tumor/Testing"
         
         for class_name in sorted(os.listdir(img_dir)):
             class_folder = os.path.join(img_dir, class_name)

@@ -71,6 +71,7 @@ def DS(model, denoiser, encoder, decoder, test_loader, mode, logfilename):
                 
             imgs = model(imgs)
             acc = accuracy(imgs, labels)
+            print(acc)
             acc_meter.update(acc[0].item(), imgs.shape[0])
     
     log(logfilename, f"Acc_loss: {acc_meter.avg}")
@@ -131,9 +132,10 @@ def main():
     
     # denosier
     if args.pretrained_denoiser:
-        checkpoint = torch.load(args.pretrained_denoiser)
-        denoiser = get_architecture(checkpoint['arch'], args.dataset)
-        print(denoiser.load_state_dict(checkpoint['state_dict']))
+        # checkpoint = torch.load(args.pretrained_denoiser)
+        # denoiser = get_architecture(checkpoint['arch'], args.dataset)
+        denoiser = torch.load(args.pretrained_denoiser)
+        # print(denoiser.load_state_dict(checkpoint['state_dict']))
 
     # classifier
     print(args.classifier)

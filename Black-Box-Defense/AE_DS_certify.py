@@ -8,15 +8,15 @@ import datetime
 import os
 import torch
 from torch.utils.data import DataLoader
-from robustness import datasets as dataset_r
-from robustness.tools.imagenet_helpers import common_superclass_wnid, ImageNetHierarchy
+# from robustness import datasets as dataset_r
+# from robustness.tools.imagenet_helpers import common_superclass_wnid, ImageNetHierarchy
 
 parser = argparse.ArgumentParser(description='Certify many examples')
 parser.add_argument("--dataset", choices=DATASETS, help="which dataset")
 
 parser.add_argument("--sigma", type=float, help="noise hyperparameter")
 parser.add_argument("--outfile", type=str, help="output file")
-parser.add_argument("--batch", type=int, default=1000, help="batch size")
+parser.add_argument("--batch", type=int, default=4, help="batch size")
 parser.add_argument("--skip", type=int, default=1, help="how many examples to skip")
 parser.add_argument("--max", type=int, default=-1, help="stop after this many examples")
 parser.add_argument("--split", choices=["train", "test"], default="test", help="train or test set")
@@ -45,7 +45,7 @@ parser.add_argument('--pretrained-decoder', default='', type=str,
 
 parser.add_argument('--encoder_arch', type=str, default='cifar_encoder', choices=AUTOENCODER_ARCHITECTURES)
 parser.add_argument('--decoder_arch', type=str, default='cifar_decoder', choices=AUTOENCODER_ARCHITECTURES)
-parser.add_argument('--arch', type=str, choices=DENOISERS_ARCHITECTURES)
+parser.add_argument('--arch', type=str, default="imagenet_dncnn", choices=DENOISERS_ARCHITECTURES)
 
 parser.add_argument('--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
@@ -73,16 +73,32 @@ if __name__ == "__main__":
         custom_dataset = dataset_r.CustomImageNet(in_path, class_ranges)
         _, test_loader = custom_dataset.make_loaders(workers=4, batch_size=1)
 
+    elif args.dataset == "SIPADMEK":
+        test_dataset = get_dataset(args.dataset, split="Test")
+
+        test_loader = DataLoader(test_dataset, batch_size=args.batch, shuffle=False)
+            
+
+    elif args.dataset == "Brain_Tumor" :
+        test_dataset = get_dataset(args.dataset, 'Test')
+
+        test_loader = DataLoader(test_dataset, batch_size=args.batch, shuffle=False)
+
+
     # --------------------- Model Loading -------------------------
     # a) Classifier / Reconstructor
-    checkpoint = torch.load(args.base_classifier)
-    base_classifier = get_architecture(checkpoint['arch'], args.dataset)
-    base_classifier.load_state_dict(checkpoint['state_dict'])
-
+    # checkpoint = torch.load(args.base_classifier)
+    # base_classifier = get_architecture(checkpoint['arch'], args.dataset)
+    # base_classifier.load_state_dict(checkpoint['state_dict'])
+    
+    base_classifier = get_architecture(args.base_classifier, args.dataset)
+    
     # b) Denoiser
     if args.pretrained_denoiser:
         checkpoint = torch.load(args.pretrained_denoiser)
-        assert checkpoint['arch'] == args.arch
+        print(checkpoint['arch'])
+        print(args.arch)
+        # assert checkpoint['arch'] == args.arch
         denoiser = get_architecture(checkpoint['arch'], args.dataset)
         denoiser.load_state_dict(checkpoint['state_dict'])
     else:
@@ -108,12 +124,15 @@ if __name__ == "__main__":
     base_classifier = base_classifier.eval().cuda()
 
     # create the smooothed classifier g
-    smoothed_classifier = Smooth(base_classifier, get_num_classes(args.dataset), args.sigma)
+    smoothed_classifier = Smooth(base_classifier, # classifier 
+                                 get_num_classes(args.dataset), 
+                                 args.sigma)# noise_sd
 
     # prepare output file
-    if not os.path.exists(args.outfile.split('sigma')[0]):
-        os.makedirs(args.outfile.split('sigma')[0])
+    # if not os.path.exists(args.outfile.split('sigma')[0]):
+    #     os.makedirs(args.outfile.split('sigma')[0])
 
+    
     f = open(args.outfile, 'w')
     print("idx\tlabel\tpredict\tradius\tSta_correct\ttime\tcount\tSta_count", file=f, flush=True)
     print("idx\tlabel\tpredict\tradius\tSta_correct\ttime\tcount\tSta_count", flush=True)
@@ -133,7 +152,11 @@ if __name__ == "__main__":
         before_time = time()
         # certify the prediction of g around x
         x = x.cuda()
-        prediction, radius = smoothed_classifier.certify(x, args.N0, args.N, args.alpha, args.batch)
+        prediction, radius = smoothed_classifier.certify(x, 
+                                                         args.N0, 
+                                                         args.N, 
+                                                         args.alpha, 
+                                                         args.batch)
         after_time = time()
         # correct = int(prediction == label)
         correct = int(prediction == label and radius > args.l2radius)
