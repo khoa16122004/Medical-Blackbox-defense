@@ -74,6 +74,7 @@ parser.add_argument('--train_method', default='part', type=str,
 parser.add_argument('--outdir', type=str, default="experiment/SIPADMEK_CE_0.25",help='folder to save denoiser and training log)')
 parser.add_argument('--workers', default=None, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
+parser.add_argument("--criterion_mode", default='CE', type=str, choices=['CE', 'MSE'])
 parser.add_argument('--optimizer', default='Adam', type=str,
                     help='SGD, Adam', choices=['SGD', 'Adam'])
 parser.add_argument('--epochs', default=200, type=int, metavar='N',
@@ -236,8 +237,12 @@ def main():
 
     # --------------------- Objective function ---------------------
     if args.train_objective == 'classification':
-        criterion = CrossEntropyLoss(size_average=None, reduce=False, reduction='none').cuda()
-        # criterion = MSE_CE_loss()
+        if args.criterion_type == 'CE':
+            criterion = CrossEntropyLoss(size_average=None, reduce=False, reduction='none').cuda()
+        
+        elif args.criterion_type == "MSE_CE":
+            criterion = MSE_CE_loss()
+            
     elif args.train_objective == 'reconstruction':
         criterion = MSELoss(size_average=None, reduce=None, reduction='none').cuda()
 
@@ -396,8 +401,13 @@ def train(loader: DataLoader, denoiser: torch.nn.Module,
 
         if args.optimization_method == 'FO':
             output = classifier(recon)
-            loss = criterion(output, targets).mean()
-            # loss = criterion(recon, inputs, output, targets)
+            if args.criterion_mode == 'CE':
+                loss = criterion(output, targets).mean()
+
+            elif args.criterion_mode == 'MSE_CE':
+                loss = criterion(recon, inputs, output, targets)
+            
+            loss = criterion(recon, inputs, output, targets)
             # loss = criterion(criterion.cal_ce_loss(recon, inputs).mean(),
                             #  criterion.cal_ce_loss(output, targets).mean())
             # record loss

@@ -2,7 +2,7 @@ from architectures import get_architecture, IMAGENET_CLASSIFIERS, AUTOENCODER_AR
 from core import Smooth
 from datasets import get_dataset, DATASETS, get_num_classes
 from time import time
-
+from tqdm import tqdm
 import argparse
 import datetime
 import os
@@ -18,17 +18,17 @@ parser.add_argument("--sigma", type=float, help="noise hyperparameter")
 parser.add_argument("--outfile", type=str, help="output file")
 parser.add_argument("--batch", type=int, default=4, help="batch size")
 parser.add_argument("--skip", type=int, default=1, help="how many examples to skip")
-parser.add_argument("--max", type=int, default=-1, help="stop after this many examples")
+parser.add_argument("--max", type=int, default=200, help="stop after this many examples")
 parser.add_argument("--split", choices=["train", "test"], default="test", help="train or test set")
-parser.add_argument("--N0", type=int, default=100)
-parser.add_argument("--N", type=int, default=10000, help="number of samples to use")
+parser.add_argument("--N0", type=int, default=10)
+parser.add_argument("--N", type=int, default=1000, help="number of samples to use")
 parser.add_argument("--alpha", type=float, default=0.001, help="failure probability")
 parser.add_argument('--philly_imagenet_path', type=str, default='',
                     help='Path to imagenet on philly')
 parser.add_argument('--azure_datastore_path', type=str, default='',
                     help='Path to imagenet on azure')
 
-parser.add_argument('--l2radius', type=float, help='l2 radius')
+parser.add_argument('--l2radius', default=0.25, type=float, help='l2 radius')
 
 # Model Arch & Checkpoint
 parser.add_argument('--model_type', default='DS', type=str,
@@ -76,13 +76,12 @@ if __name__ == "__main__":
     elif args.dataset == "SIPADMEK":
         test_dataset = get_dataset(args.dataset, split="Test")
 
-        test_loader = DataLoader(test_dataset, batch_size=args.batch, shuffle=False)
+        test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
             
 
     elif args.dataset == "Brain_Tumor" :
         test_dataset = get_dataset(args.dataset, 'Test')
-
-        test_loader = DataLoader(test_dataset, batch_size=args.batch, shuffle=False)
+        test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
 
     # --------------------- Model Loading -------------------------
@@ -96,8 +95,6 @@ if __name__ == "__main__":
     # b) Denoiser
     if args.pretrained_denoiser:
         checkpoint = torch.load(args.pretrained_denoiser)
-        print(checkpoint['arch'])
-        print(args.arch)
         # assert checkpoint['arch'] == args.arch
         denoiser = get_architecture(checkpoint['arch'], args.dataset)
         denoiser.load_state_dict(checkpoint['state_dict'])
@@ -141,8 +138,8 @@ if __name__ == "__main__":
     # iterate through the dataset
     count = 0
     sta_count = 0
-    for i, (x, label) in enumerate(test_loader):
-
+    for i, (x, label) in tqdm(enumerate(test_loader)):
+        print(x.shape)
         # only certify every args.skip examples, and stop after args.max examples
         if i % args.skip != 0:
             continue
@@ -159,6 +156,7 @@ if __name__ == "__main__":
                                                          args.batch)
         after_time = time()
         # correct = int(prediction == label)
+        print("radius: ", radius)
         correct = int(prediction == label and radius > args.l2radius)
         sta_correct = int(prediction == label)
 

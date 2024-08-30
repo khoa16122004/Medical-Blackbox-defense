@@ -49,10 +49,12 @@ class Smooth(object):
         cAHat = counts_selection.argmax().item()
         # draw more samples of f(x + epsilon)
         counts_estimation = self._sample_noise(x, n, batch_size)
+
         # use these samples to estimate a lower bound on pA
         nA = counts_estimation[cAHat].item()
         pABar = self._lower_confidence_bound(nA, n, alpha)
 
+        
         if pABar < 0.5:
             return Smooth.ABSTAIN, 0.0
         else:

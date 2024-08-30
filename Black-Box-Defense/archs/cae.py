@@ -73,7 +73,7 @@ class Decoder_1000(nn.Module):
             nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1),  # 64x192x192
             nn.ReLU(True),
             nn.ConvTranspose2d(64, 3, kernel_size=4, stride=2, padding=1),  # 3x384x384
-            nn.Sigmoid()  # Áp dụng sigmoid để đảm bảo đầu ra trong khoảng [0, 1]
+            nn.Sigmoid()  
         )
     
     def forward(self, x):
