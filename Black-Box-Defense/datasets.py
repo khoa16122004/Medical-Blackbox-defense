@@ -29,7 +29,7 @@ from config import *
 IMAGENET_LOC_ENV = "IMAGENET_DIR"
 
 # list of all datasets
-DATASETS = ["SIPADMEK", "Brain_Tumor", "imagenet", "imagenet32", "cifar10", "mnist", "stl10", "restricted_imagenet"]
+DATASETS = ["SIPADMEK_Noise", "SIPADMEK", "Brain_Tumor","Brain_Tumor_Noise", "imagenet", "imagenet32", "cifar10", "mnist", "stl10", "restricted_imagenet"]
 
 img_to_tensor = ToTensor()
 
@@ -42,6 +42,9 @@ def get_dataset(dataset: str, split: str) -> Dataset:
     elif dataset == "Brain_Tumor":
         return BrainTumorDataset(split)
     
+    elif dataset == "Brain_Tumor_Noise":
+        return BrainTumorDataset_Noise(split)
+    
     elif dataset == "SIPADMEK":
         if split == "Train":
             return SIPADMEK(img_dir=r"Dataset/SIPADMEK/process",
@@ -52,8 +55,9 @@ def get_dataset(dataset: str, split: str) -> Dataset:
                             transform=transforms.Compose([transforms.Resize((384, 384)), 
                                                         transforms.ToTensor()])
                             )
-    
-    
+    elif dataset == "SIPADMEK_Noise":
+        return SIPADMEK_Noise(split)
+        
     elif dataset == "imagenet32":
         return _imagenet32(split)
 
@@ -230,11 +234,46 @@ class SIPADMEK(Dataset):
         if self.transform:
             img = self.transform(img)
         label = int(self.labels[index])
+        return img, label, os.path.basename(img_path)
+class SIPADMEK_Noise(Dataset):    
+    def __init__(self, split, # FGSM, DDN, PGD
+                 transform=transforms.Compose([transforms.Resize((384, 384)),
+                                               transforms.RandomApply([transforms.ColorJitter(0.2, 0.2, 0.2),transforms.RandomPerspective(distortion_scale=0.2),], p=0.3),
+                                               transforms.RandomApply([transforms.ColorJitter(0.2, 0.2, 0.2),transforms.RandomAffine(degrees=10),], p=0.3),
+                                               transforms.RandomVerticalFlip(p=0.3),
+                                               transforms.RandomHorizontalFlip(p=0.3),
+                                               transforms.ToTensor(),
+                                               ])):
+        
+        self.transform = transform
+        img_dir = f"Dataset/SIPADMEK/AT_{split}"
+        
+        img_paths = []
+        labels = []
+        
+        for label_name in os.listdir(img_dir):
+            label_dir = os.path.join(img_dir, label_name)
+            for file_name in os.listdir(label_dir):
+                file_path = os.path.join(label_dir, file_name)
+                img_paths.append(file_path)        
+                labels.append(label_name)
+        
+        self.img_paths = img_paths
+        self.labels = labels
+                
+    def __len__(self) -> int:
+        return len(self.img_paths)
+    
+    def __getitem__(self, index):
+        img_path = self.img_paths[index]
+        img = Image.open(img_path).convert("RGB")
+        if self.transform:
+            img = self.transform(img)
+        label = int(self.labels[index])
+        # return img, label, os.path.basename(img_path)
         return img, label
 
-
-
-class BrainTumorDataset(Dataset):
+class BrainTumorDataset(Dataset):   
     def __init__(self, mode="Train", 
                  transform=transforms.Compose([transforms.Resize((384,384)), 
                                                transforms.ToTensor()])):
@@ -278,9 +317,52 @@ class BrainTumorDataset(Dataset):
         if self.transform:
             img = self.transform(img)
         label_ts = self.labels[idx]
+        return img, label_ts, os.path.basename(img_path)
+class BrainTumorDataset_Noise(Dataset):
+    def __init__(self,
+                 split, # ["FGSM", "PGD", "DDN"]
+                 transform=transforms.Compose([transforms.Resize((384,384)), 
+                                               transforms.ToTensor()])):
+        
+        
+        img_paths = []
+        labels = []
+        img_dir = f"Dataset\Brain_Tumor\AT_{split}"
+        
+        for label in os.listdir(img_dir):
+            class_folder = os.path.join(img_dir, label)
+            for file_name in os.listdir(class_folder):
+                file_path = os.path.join(class_folder, file_name)
+                img_paths.append(file_path)
+                labels.append(label)
+        
+        
+        self.num2label = {0: 'glioma',
+                          1: 'meningioma',
+                          2: 'notumor',
+                          3: 'pituitary',
+                          }
+        self.img_paths = img_paths
+        self.labels = labels
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.img_paths)
+
+    def __getitem__(self, idx):
+        img_path = self.img_paths[idx]
+        img = Image.open(img_path).convert('RGB')
+        if self.transform:
+            img = self.transform(img)
+        label_ts = int(self.labels[idx])
+        # return img, label_ts, os.path.basename(img_path)
         return img, label_ts
 
+# test_dataset = get_dataset("Brain_Tumor", "Test")
+# test_loader = DataLoader(test_dataset, .batch, shuffle=False)
 
+# img, label, basename = test_dataset[0]
+# print(label.item())
 
 
 def _stl10(split: str) -> Dataset:
@@ -499,7 +581,7 @@ class ImageNetDS(Dataset):
 
 
 
-if __name__ == "__main__":
-    dataset = get_dataset('imagenet32', 'train')
-    embed()
+# if __name__ == "__main__":
+#     dataset = get_dataset('imagenet32', 'train')
+#     embed()
 

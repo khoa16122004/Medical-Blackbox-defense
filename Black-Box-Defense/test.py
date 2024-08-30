@@ -18,8 +18,9 @@ from config import *
 parser = argparse.ArgumentParser(description="Image Recontruction")
 
 parser.add_argument('--mode', type=str, default='infer_DS') # ["CLF", 'AE_DS', 'DS', 'infer_AE_DS', 'infer_DS']
+parser.add_argument('--split', type=str, default=None)
 parser.add_argument('--dataset', type=str, choices=DATASETS, default="Brain_Tumor")
-parser.add_argument('--batch', default=32 , type=int)
+parser.add_argument('--batch', default=1 , type=int)
 parser.add_argument('--classifier', default='vit_sipadmek', type=str,
                     help='path to the classifier used with the `classificaiton`'
                          'or `stability` objectives of the denoiser.')
@@ -44,7 +45,9 @@ def classfier(model, test_loader):
     acc_meter = AverageMeter()
     with torch.no_grad():
         for (imgs, labels) in tqdm(test_loader):
+            print(labels)
             imgs, labels = imgs.cuda(), labels.cuda()
+            
             imgs = model(imgs)
             acc = accuracy(imgs, labels)
             acc_meter.update(acc[0].item(), imgs.shape[0])
@@ -101,7 +104,7 @@ def inference(test_dataset, index, denoiser, encoder, decoder, img_path, mode,
 
         if "AE_DS" in mode:
             img = encoder(img)
-            img = decoder(encoder_img)
+            img = decoder(img)
             save_image(img, os.path.join(args.out_dir, "ae_ds.jpg"))
     
 def main():
@@ -119,7 +122,8 @@ def main():
         test_dataset = get_dataset(args.dataset, 'test')
         test_loader = DataLoader(test_dataset, batch_size=args.batch, shuffle=False)
     else:
-        test_dataset = get_dataset(args.dataset, 'Test')
+        test_dataset = get_dataset(args.dataset, args.split)
+        print(test_dataset)
         test_loader = DataLoader(test_dataset, args.batch, shuffle=False)
 
     # encoder
@@ -132,10 +136,11 @@ def main():
     
     # denosier
     if args.pretrained_denoiser:
-        # checkpoint = torch.load(args.pretrained_denoiser)
-        # denoiser = get_architecture(checkpoint['arch'], args.dataset)
-        denoiser = torch.load(args.pretrained_denoiser)
-        # print(denoiser.load_state_dict(checkpoint['state_dict']))
+        checkpoint = torch.load(args.pretrained_denoiser)
+        denoiser = get_architecture(checkpoint['arch'], args.dataset)
+        denoiser.load_state_dict(checkpoint['state_dict'])
+        # denoiser = torch.load(args.pretrained_denoiser)
+
 
     # classifier
     print(args.classifier)
