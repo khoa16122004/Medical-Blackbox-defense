@@ -407,7 +407,7 @@ def train(loader: DataLoader, denoiser: torch.nn.Module,
             elif args.criterion_mode == 'MSE_CE':
                 loss = criterion(recon, inputs, output, targets)
             
-            loss = criterion(recon, inputs, output, targets)
+            # loss = criterion(recon, inputs, output, targets)
             # loss = criterion(criterion.cal_ce_loss(recon, inputs).mean(),
                             #  criterion.cal_ce_loss(output, targets).mean())
             # record loss
