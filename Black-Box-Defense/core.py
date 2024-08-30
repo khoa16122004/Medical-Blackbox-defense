@@ -48,19 +48,19 @@ class Smooth(object):
         # use these samples to take a guess at the top class
         cAHat = counts_selection.argmax().item()
         # draw more samples of f(x + epsilon)
-        counts_estimation = self._sample_noise(x, n, batch_size)
+        # counts_estimation = self._sample_noise(x, n, batch_size)
 
         # use these samples to estimate a lower bound on pA
-        nA = counts_estimation[cAHat].item()
-        pABar = self._lower_confidence_bound(nA, n, alpha)
+        # nA = counts_estimation[cAHat].item()
+        # pABar = self._lower_confidence_bound(nA, n, alpha)
 
         
-        if pABar < 0.5:
-            return Smooth.ABSTAIN, 0.0
-        else:
-            radius = self.sigma * norm.ppf(pABar)
-            return cAHat, radius
-
+        # if pABar < 0.5:
+            # return Smooth.ABSTAIN, 0.0
+        # else:
+            # radius = self.sigma * norm.ppf(pABar)
+            # return cAHat, radius
+        return cAHat
     def predict(self, x: torch.tensor, n: int, alpha: float, batch_size: int) -> int:
         """ Monte Carlo algorithm for evaluating the prediction of g at x.  With probability at least 1 - alpha, the
         class returned by this method will equal g(x).

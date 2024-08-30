@@ -18,9 +18,9 @@ parser.add_argument("--sigma", type=float, help="noise hyperparameter")
 parser.add_argument("--outfile", type=str, help="output file")
 parser.add_argument("--batch", type=int, default=4, help="batch size")
 parser.add_argument("--skip", type=int, default=1, help="how many examples to skip")
-parser.add_argument("--max", type=int, default=200, help="stop after this many examples")
-parser.add_argument("--split", choices=["train", "test"], default="test", help="train or test set")
-parser.add_argument("--N0", type=int, default=10)
+parser.add_argument("--max", type=int, default=20000, help="stop after this many examples")
+parser.add_argument("--split", choices=["FGSM", "test", "PGD", "DDN"], default="test", help="train or test set")
+parser.add_argument("--N0", type=int, default=100)
 parser.add_argument("--N", type=int, default=1000, help="number of samples to use")
 parser.add_argument("--alpha", type=float, default=0.001, help="failure probability")
 parser.add_argument('--philly_imagenet_path', type=str, default='',
@@ -73,14 +73,14 @@ if __name__ == "__main__":
         custom_dataset = dataset_r.CustomImageNet(in_path, class_ranges)
         _, test_loader = custom_dataset.make_loaders(workers=4, batch_size=1)
 
-    elif args.dataset == "SIPADMEK":
-        test_dataset = get_dataset(args.dataset, split="Test")
+    elif args.dataset in ["SIPADMEK", "SIPADMEK_Noise"]:
+        test_dataset = get_dataset(args.dataset, split=args.split)
 
         test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
             
 
-    elif args.dataset == "Brain_Tumor" :
-        test_dataset = get_dataset(args.dataset, 'Test')
+    elif args.dataset in ["Brain_Tumor", "Brain_Tumor_Noise"] :
+        test_dataset = get_dataset(args.dataset, args.split)
         test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
 
@@ -139,7 +139,6 @@ if __name__ == "__main__":
     count = 0
     sta_count = 0
     for i, (x, label) in tqdm(enumerate(test_loader)):
-        print(x.shape)
         # only certify every args.skip examples, and stop after args.max examples
         if i % args.skip != 0:
             continue
@@ -157,17 +156,20 @@ if __name__ == "__main__":
         after_time = time()
         # correct = int(prediction == label)
         print("radius: ", radius)
-        correct = int(prediction == label and radius > args.l2radius)
+        # correct = int(prediction == label and radius > args.l2radius)
         sta_correct = int(prediction == label)
 
-        count += correct
+        # count += correct
         sta_count += sta_correct
 
         time_elapsed = str(datetime.timedelta(seconds=(after_time - before_time)))
 
-        f = open(args.outfile, 'a')
-        print("{}\t{}\t{}\t{:.3}\t{}\t{}\t{}\t{}".format(
-            i, label, prediction, radius, sta_correct, time_elapsed, count, sta_count), file=f, flush=True)
-        print("{}\t{}\t{}\t{:.3}\t{}\t{}\t{}\t{}".format(
-            i, label, prediction, radius, sta_correct, time_elapsed, count, sta_count), flush=True)
-        f.close()
+        # f = open(args.outfile, 'a')
+        # print("{}\t{}\t{}\t{:.3}\t{}\t{}\t{}\t{}".format(
+        #     i, label, prediction, radius, sta_correct, time_elapsed, count, sta_count), file=f, flush=True)
+        # print("{}\t{}\t{}\t{:.3}\t{}\t{}\t{}\t{}".format(
+        #     i, label, prediction, radius, sta_correct, time_elapsed, count, sta_count), flush=True)
+        # f.close()
+    print(sta_count / len(test_dataset))
+    
+    

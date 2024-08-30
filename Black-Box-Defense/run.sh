@@ -11,4 +11,4 @@ python test.py --mode infer_DS --pretrained_encoder /mlcv2/WorkingSpace/Personal
 
 
 
-python test.py --mode DS --split FGSM --dataset SIPADMEK_Noise --classifier vit_sipadmek --out_dir D:\Medical-Robustness-with-Classification-model\Medical-Blackbox-defense\Black-Box-Defense\experiment\Brain_Recon_MSE_0.25 --pretrained_denoiser D:\Medical-Robustness-with-Classification-model\Medical-Blackbox-defense\Black-Box-Defense\experiment\SIPADMEK_CE_0.25\best_denoiser.pth.tar --img_path D:\Medical-Robustness-with-Classification-model\Medical-Blackbox-defense\Black-Box-Defense\Dataset\Brain_Tumor\AT_FGSM\1\Te-me_0018.jpg
+python test.py --mode DS --split FGSM --dataset SIPADMEK_Noise --classifier vit_sipadmek --out_dir D:\Medical-Robustness-with-Classification-model\Medical-Blackbox-defense\Black-Box-Defense\experiment\SIPADMEK_CE_0.25 --pretrained_denoiser D:\Medical-Robustness-with-Classification-model\Medical-Blackbox-defense\Black-Box-Defense\experiment\SIPADMEK_CE_0.25\best_denoiser.pth.tar --img_path D:\Medical-Robustness-with-Classification-model\Medical-Blackbox-defense\Black-Box-Defense\Dataset\Brain_Tumor\AT_FGSM\1\Te-me_0018.jpg

@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from adversarial_library.adv_lib.attacks import fast_gradient_sign_method
+from adversarial_library.adv_lib.attacks import fast_gradient_sign_method, ddn
 from datasets import get_dataset
 from torch.utils.data import DataLoader
 
@@ -21,22 +21,49 @@ parser.add_argument('--type', type=str, default="PGD", choices=["PGD", "FGSM", "
 args = parser.parse_args()
 
 
+class Model_(nn.Module):
+    def __init__(self, model):
+        super(Model_, self).__init__()
+        self.main = model
+        self.softmax = nn.Softmax(dim=1)
+    def forward(self, x):
+        x = self.main(x)
+        x = self.softmax(x)
+        return x
+
 def create_adversarial(model: nn.Module, 
                        criterion: nn.Module, 
                        img: Tensor,
                        label: Tensor,
                        type: str):
-
+    
+    
+    
+    
+    
     if type == "PGD":
-        print()
+        adversarial_image = fast_gradient_sign_method.PGD(model,
+                                                          img,
+                                                          criterion,
+                                                          label)
+
     elif type == "FGSM":
         adversarial_image = fast_gradient_sign_method.FGSM(model, img, criterion, label)
     elif type == "DDN":
-        print()
+        adversarial_image = ddn(model=model, inputs=img, labels=label, steps=50)
+
     return adversarial_image
         
 
-
+class Model_(nn.Module):
+    def __init__(self, model):
+        super(Model_, self).__init__()
+        self.main = model
+        self.softmax = nn.Softmax(dim=1)
+    def forward(self, x):
+        x = self.main(x)
+        x = self.softmax(x)
+        return x
 
 
 def main():
@@ -45,6 +72,8 @@ def main():
 
 
     model = torch.load(args.classifier, map_location="cuda:0")
+    if args.type == "DDN":        
+        model = Model_(model).cuda()
     criterion = CrossEntropyLoss(size_average=None, reduce=False, reduction='none').cuda()
     
     if args.dataset == "Brain_Tumor":
