@@ -237,7 +237,7 @@ def main():
 
     # --------------------- Objective function ---------------------
     if args.train_objective == 'classification':
-        if args.criterion_type == 'CE':
+        if args.criterion_mode == 'CE':
             criterion = CrossEntropyLoss(size_average=None, reduce=False, reduction='none').cuda()
         
         elif args.criterion_type == "MSE_CE":
