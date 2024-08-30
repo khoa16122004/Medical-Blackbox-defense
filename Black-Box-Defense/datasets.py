@@ -234,7 +234,7 @@ class SIPADMEK(Dataset):
         if self.transform:
             img = self.transform(img)
         label = int(self.labels[index])
-        return img, label, os.path.basename(img_path)
+        return img, label
 class SIPADMEK_Noise(Dataset):    
     def __init__(self, split, # FGSM, DDN, PGD
                  transform=transforms.Compose([transforms.Resize((384, 384)),
@@ -317,7 +317,7 @@ class BrainTumorDataset(Dataset):
         if self.transform:
             img = self.transform(img)
         label_ts = self.labels[idx]
-        return img, label_ts, os.path.basename(img_path)
+        return img, label_ts
 class BrainTumorDataset_Noise(Dataset):
     def __init__(self,
                  split, # ["FGSM", "PGD", "DDN"]
