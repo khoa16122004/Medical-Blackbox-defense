@@ -135,7 +135,7 @@ _STL10_STDDEV = [1.0, 1.0, 1.0]
 class SIPADMEK(Dataset):
     def extract_data(self, image_dir: str,
                 class_name: str,
-                output_dir="Dataset\SIPADMEK\process",
+                output_dir="Dataset/SIPADMEK/process",
                 class_map = {
                     "im_Dyskeratotic": 0, # abnormal
                     "im_Koilocytotic": 0, # abnormal
@@ -332,7 +332,7 @@ class BrainTumorDataset_Noise(Dataset):
         
         img_paths = []
         labels = []
-        img_dir = f"Dataset\Brain_Tumor\AT_{split}"
+        img_dir = f"Dataset/Brain_Tumor/AT_{split}"
         
         for label in os.listdir(img_dir):
             class_folder = os.path.join(img_dir, label)
