@@ -43,7 +43,9 @@ def get_dataset(dataset: str, split: str) -> Dataset:
         return BrainTumorDataset(split)
     
     elif dataset == "Brain_Tumor_Noise":
-        return BrainTumorDataset_Noise(split)
+        return BrainTumorDataset_Noise(split,
+                                       transform=transforms.Compose([transforms.Resize((384, 384)), 
+                                                        transforms.ToTensor()]))
     
     elif dataset == "SIPADMEK":
         if split == "Train":
@@ -56,7 +58,9 @@ def get_dataset(dataset: str, split: str) -> Dataset:
                                                         transforms.ToTensor()])
                             )
     elif dataset == "SIPADMEK_Noise":
-        return SIPADMEK_Noise(split)
+        return SIPADMEK_Noise(split,
+                              transform=transforms.Compose([transforms.Resize((384, 384)), 
+                                                        transforms.ToTensor()]))
         
     elif dataset == "imagenet32":
         return _imagenet32(split)
@@ -78,9 +82,9 @@ def get_num_classes(dataset: str):
     if dataset == "imagenet":
         return 1000
     
-    elif dataset == "Brain_Tumor":
+    elif dataset in ["Brain_Tumor", "Brain_Tumor_Noise"]:
         return 4
-    elif dataset == "SIPADMEK":
+    elif dataset in ["SIPADMEK", "SIPADMEK_Noise"]:
         return 3
     
     elif dataset == "stl10":
@@ -317,6 +321,7 @@ class BrainTumorDataset(Dataset):
         if self.transform:
             img = self.transform(img)
         label_ts = self.labels[idx]
+        # return img, label_ts, os.path.basename(img_path)
         return img, label_ts
 class BrainTumorDataset_Noise(Dataset):
     def __init__(self,

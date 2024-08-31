@@ -14,7 +14,7 @@ from torch.utils.data import DataLoader
 parser = argparse.ArgumentParser(description='Certify many examples')
 parser.add_argument("--dataset", choices=DATASETS, help="which dataset")
 
-parser.add_argument("--sigma", type=float, help="noise hyperparameter")
+parser.add_argument("--sigma", type=float, default=0.25, help="noise hyperparameter")
 parser.add_argument("--outfile", type=str, help="output file")
 parser.add_argument("--batch", type=int, default=4, help="batch size")
 parser.add_argument("--skip", type=int, default=1, help="how many examples to skip")
@@ -130,10 +130,10 @@ if __name__ == "__main__":
     #     os.makedirs(args.outfile.split('sigma')[0])
 
     
-    f = open(args.outfile, 'w')
-    print("idx\tlabel\tpredict\tradius\tSta_correct\ttime\tcount\tSta_count", file=f, flush=True)
-    print("idx\tlabel\tpredict\tradius\tSta_correct\ttime\tcount\tSta_count", flush=True)
-    f.close()
+    # f = open(args.outfile, 'w')
+    # print("idx\tlabel\tpredict\tradius\tSta_correct\ttime\tcount\tSta_count", file=f, flush=True)
+    # print("idx\tlabel\tpredict\tradius\tSta_correct\ttime\tcount\tSta_count", flush=True)
+    # f.close()
 
     # iterate through the dataset
     count = 0
@@ -148,14 +148,15 @@ if __name__ == "__main__":
         before_time = time()
         # certify the prediction of g around x
         x = x.cuda()
-        prediction, radius = smoothed_classifier.certify(x, 
-                                                         args.N0, 
-                                                         args.N, 
-                                                         args.alpha, 
-                                                         args.batch)
+        # prediction, radius = smoothed_classifier.certify(x, 
+        prediction = smoothed_classifier.certify(x, 
+                                                 args.N0, 
+                                                 args.N, 
+                                                 args.alpha, 
+                                                 args.batch)
         after_time = time()
         # correct = int(prediction == label)
-        print("radius: ", radius)
+        # print("radius: ", radius)
         # correct = int(prediction == label and radius > args.l2radius)
         sta_correct = int(prediction == label)
 

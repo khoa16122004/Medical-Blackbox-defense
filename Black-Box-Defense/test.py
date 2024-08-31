@@ -33,7 +33,7 @@ parser.add_argument('--arch', type=str, default="cifar_dncnn_wide")
 parser.add_argument('--decoder_arch', type=None, default="Decoder_Vit_1000")
 parser.add_argument('--pretrained_encoder', type=str, default=None)
 parser.add_argument('--pretrained_decoder', type=str, default=None)
-parser.add_argument('--out_dir', type=str, default="experiment\SIPADMEK_CE_0.25")
+parser.add_argument('--out_dir', type=str, default=None)
 parser.add_argument('--img_path', type=str, default=None)
 
 
@@ -45,7 +45,6 @@ def classfier(model, test_loader):
     acc_meter = AverageMeter()
     with torch.no_grad():
         for (imgs, labels) in tqdm(test_loader):
-            print(labels)
             imgs, labels = imgs.cuda(), labels.cuda()
             
             imgs = model(imgs)
@@ -77,7 +76,8 @@ def DS(model, denoiser, encoder, decoder, test_loader, mode, logfilename):
             print(acc)
             acc_meter.update(acc[0].item(), imgs.shape[0])
     
-    log(logfilename, f"Acc_loss: {acc_meter.avg}")
+    # log(logfilename, f"Acc_loss: {acc_meter.avg}")
+    print(f"Acc_loss: {acc_meter.avg}")
     
 def inference(test_dataset, index, denoiser, encoder, decoder, img_path, mode, 
               transform = transforms.Compose([transforms.Resize((384,384)), 
@@ -109,12 +109,13 @@ def inference(test_dataset, index, denoiser, encoder, decoder, img_path, mode,
     
 def main():
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    if not os.path.exists(args.out_dir):
-        os.makedirs(args.out_dir)
+    if args.out_dir:
+        if not os.path.exists(args.out_dir):
+            os.makedirs(args.out_dir)
         
-    logfilename = os.path.join(args.out_dir, 'log.txt')
-    if not os.path.isfile(logfilename):
-        init_logfile(logfilename, "epoch\Train_Loss\Val_Loss")
+    # logfilename = os.path.join(args.out_dir, 'log.txt')
+    # if not os.path.isfile(logfilename):
+        # init_logfile(logfilename, "epoch\Train_Loss\Val_Loss")
 
         
     # dataset 

@@ -50,7 +50,7 @@ def create_adversarial(model: nn.Module,
     elif type == "FGSM":
         adversarial_image = fast_gradient_sign_method.FGSM(model, img, criterion, label)
     elif type == "DDN":
-        adversarial_image = ddn(model=model, inputs=img, labels=label, steps=50)
+        adversarial_image = ddn(model=model, inputs=img, labels=label, steps=100)
 
     return adversarial_image
         
@@ -73,7 +73,7 @@ def main():
 
     model = torch.load(args.classifier, map_location="cuda:0")
     if args.type == "DDN":        
-        model = Model_(model).cuda()
+        model = Model_(model).train().cuda()
     criterion = CrossEntropyLoss(size_average=None, reduce=False, reduction='none').cuda()
     
     if args.dataset == "Brain_Tumor":
