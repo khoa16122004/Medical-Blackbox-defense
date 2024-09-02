@@ -240,7 +240,7 @@ def main():
         if args.criterion_mode == 'CE':
             criterion = CrossEntropyLoss(size_average=None, reduce=False, reduction='none').cuda()
         
-        elif args.criterion_type == "MSE_CE":
+        elif args.criterion_mode == "MSE_CE":
             criterion = MSE_CE_loss()
             
     elif args.train_objective == 'reconstruction':
