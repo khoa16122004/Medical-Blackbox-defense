@@ -17,7 +17,7 @@ parser.add_argument("--dataset", choices=DATASETS, help="which dataset")
 parser.add_argument("--sigma", type=float, default=0.25, help="noise hyperparameter")
 parser.add_argument("--outfile", type=str, help="output file")
 parser.add_argument("--batch", type=int, default=4, help="batch size")
-parser.add_argument("--skip", type=int, default=1, help="how many examples to skip")
+parser.add_argument("--skip", type=int, default=15, help="how many examples to skip")
 parser.add_argument("--max", type=int, default=20000, help="stop after this many examples")
 parser.add_argument("--split", choices=["FGSM", "test", "PGD", "DDN"], default="test", help="train or test set")
 parser.add_argument("--N0", type=int, default=100)
@@ -98,6 +98,7 @@ if __name__ == "__main__":
         # assert checkpoint['arch'] == args.arch
         denoiser = get_architecture(checkpoint['arch'], args.dataset)
         denoiser.load_state_dict(checkpoint['state_dict'])
+        # denoiser = torch.load(args.pretrained_denoiser)
     else:
         denoiser = get_architecture(args.arch, args.dataset)
 
@@ -144,7 +145,7 @@ if __name__ == "__main__":
             continue
         if i == args.max:
             break
-
+        count += 1
         before_time = time()
         # certify the prediction of g around x
         x = x.cuda()
@@ -171,6 +172,6 @@ if __name__ == "__main__":
         # print("{}\t{}\t{}\t{:.3}\t{}\t{}\t{}\t{}".format(
         #     i, label, prediction, radius, sta_correct, time_elapsed, count, sta_count), flush=True)
         # f.close()
-    print(sta_count / len(test_dataset))
+    print(sta_count / count)
     
     

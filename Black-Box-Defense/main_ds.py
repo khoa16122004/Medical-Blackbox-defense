@@ -74,7 +74,7 @@ parser.add_argument('--train_method', default='part', type=str,
 parser.add_argument('--outdir', type=str, default="experiment/SIPADMEK_CE_0.25",help='folder to save denoiser and training log)')
 parser.add_argument('--workers', default=None, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
-parser.add_argument("--criterion_mode", default='CE', type=str, choices=['CE', 'MSE'])
+parser.add_argument("--criterion_mode", default='CE', type=str, choices=['CE', 'MSE_CE'])
 parser.add_argument('--optimizer', default='Adam', type=str,
                     help='SGD, Adam', choices=['SGD', 'Adam'])
 parser.add_argument('--epochs', default=200, type=int, metavar='N',
