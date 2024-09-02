@@ -531,7 +531,11 @@ def test_with_classifier(loader: DataLoader, denoiser: torch.nn.Module, criterio
                 recon = denoiser(inputs + noise)
             # compute output
             outputs = classifier(recon)
-            loss = criterion(outputs, targets)
+            if args.criterion_mode == 'CE':
+                loss = criterion(outputs, targets).mean()
+
+            elif args.criterion_mode == 'MSE_CE':
+                loss = criterion(recon, inputs, outputs, targets)
             loss_mean = loss.mean()
             # loss_mean = criterion(recon, inputs, outputs, targets)
             # loss = criterion(criterion.cal_mse_loss(recon, inputs).mean(),
