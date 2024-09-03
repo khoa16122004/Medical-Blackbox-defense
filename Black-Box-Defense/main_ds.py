@@ -622,7 +622,7 @@ def train_ae(loader: DataLoader, encoder: torch.nn.Module, decoder: torch.nn.Mod
         if args.optimization_method == 'FO':
             recon = decoder(recon)
             recon = classifier(recon)
-            loss = criterion(recon, targets)
+            loss = criterion(recon, targets).mean()
 
             # record loss
             losses.update(loss.item(), inputs.size(0))
