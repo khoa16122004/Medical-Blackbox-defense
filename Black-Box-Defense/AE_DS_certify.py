@@ -104,16 +104,19 @@ if __name__ == "__main__":
 
     # c) AutoEncoder
     if args.model_type == 'AE_DS':
-        checkpoint = torch.load(args.pretrained_encoder)
-        assert checkpoint['arch'] == args.encoder_arch
-        encoder = get_architecture(checkpoint['arch'], args.dataset)
-        encoder.load_state_dict(checkpoint['state_dict'])
+        # checkpoint = torch.load(args.pretrained_encoder)
+        # assert checkpoint['arch'] == args.encoder_arch
+        # encoder = get_architecture(checkpoint['arch'], args.dataset)
+        # encoder.load_state_dict(checkpoint['state_dict'])
 
-        checkpoint = torch.load(args.pretrained_decoder)
-        assert checkpoint['arch'] == args.decoder_arch
-        decoder = get_architecture(checkpoint['arch'], args.dataset)
-        decoder.load_state_dict(checkpoint['state_dict'])
+        # checkpoint = torch.load(args.pretrained_decoder)
+        # assert checkpoint['arch'] == args.decoder_arch
+        # decoder = get_architecture(checkpoint['arch'], args.dataset)
+        # decoder.load_state_dict(checkpoint['state_dict'])
 
+        encoder = torch.load(args.pretrained_encoder)
+        decoder = torch.load(args.pretrained_decoder)
+        
         base_classifier = torch.nn.Sequential(denoiser, encoder, decoder, base_classifier)
 
     else:

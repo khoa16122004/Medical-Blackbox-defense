@@ -26,7 +26,6 @@ parser.add_argument('--decoder_arch', type=str, default="Decoder_Vit_1000")
 parser.add_argument('--pretrained_encoder', type=str, default=None)
 parser.add_argument('--pretrained_decoder', type=str, default=None)
 parser.add_argument('--out_dir', type=str, default="Brain_Recontruction_Vit_1000")
-parser.add_argument('--pretrained_denoiser', default='', type=str, help='path to a pretrained denoiser')
 parser.add_argument('--noise_sd', default=0.25, type=float,
                     help="standard deviation of noise distribution for data augmentation")
 parser.add_argument('--lr', '--learning-rate', default=1e-3, type=float,

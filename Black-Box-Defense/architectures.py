@@ -96,27 +96,27 @@ def get_architecture(arch: str, dataset: str, pytorch_pretrained: bool=False) ->
         return torch.load(r"best_sipadmek.pth", 
                           map_location=torch.device("cuda:0"))
     
-    elif arch == "Encoder_Vit_1000" and dataset == "Brain_Tumor": # 256
+    elif arch == "Encoder_Vit_1000": # 256
         return Encoder_Vit_1000().cuda()
-    elif arch == "Decoder_Vit_1000" and dataset == "Brain_Tumor": # 256
+    elif arch == "Decoder_Vit_1000": # 256
         return Decoder_Vit_1000().cuda()
     
-    elif arch == "Encoder_1000" and dataset == "Brain_Tumor": # 256
+    elif arch == "Encoder_1000": # 256
         return Encoder_1000().cuda()
-    elif arch == "Decoder_1000" and dataset == "Brain_Tumor": # 256
+    elif arch == "Decoder_1000": # 256
         return Decoder_1000().cuda()
     
-    elif arch == "Encoder_768" and dataset == "Brain_Tumor": # 256
+    elif arch == "Encoder_768": # 256
         return Encoder_768().cuda()
-    elif arch == "Decoder_768" and dataset == "Brain_Tumor": # 256
+    elif arch == "Decoder_768": # 256
         return Decoder_768().cuda()
     
-    elif arch == "Custom_Decoder_256" and dataset == "Brain_Tumor": # 256
+    elif arch == "Custom_Decoder_256": # 256
         return Custom_Decoder_256().cuda()
     
-    elif arch == "Custom_Encoder" and dataset == "Brain_Tumor": # 192
+    elif arch == "Custom_Encoder": # 192
         return Custom_Encoder().cuda()
-    elif arch == "Custom_Decoder" and dataset == "Brain_Tumor": # 192
+    elif arch == "Custom_Decoder": # 192
         return Custom_Decoder().cuda()
     
     elif arch == "resnet18" and dataset == "imagenet":
