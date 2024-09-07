@@ -163,8 +163,8 @@ def main():
 
 
     # conv autoencoder
-    # encoder = get_architecture(args.encoder_arch, args.dataset).cuda()
-    # decoder = get_architecture(args.decoder_arch, args.dataset).cuda()
+    encoder = get_architecture(args.encoder_arch, args.dataset).cuda()
+    decoder = get_architecture(args.decoder_arch, args.dataset).cuda()
     # encoder = torch.load(args.pretrained_encoder).cuda()
     # decoder = torch.load(args.pretrained_decoder).cuda()
     

@@ -52,7 +52,7 @@ def classfier(model, test_loader):
             acc_meter.update(acc[0].item(), imgs.shape[0])
     print(f"Acc: {acc_meter.avg}")
 
-def DS(model, denoiser, encoder, decoder, test_loader, mode, logfilename):    
+def DS(model, denoiser, encoder, decoder, test_loader, mode, logfilename=None):    
     acc_meter = AverageMeter()
     
     model.eval()
@@ -157,7 +157,7 @@ def main():
     elif 'infer' in args.mode:
        inference(test_dataset, 200, denoiser, encoder, decoder, args.img_path, args.mode)
     else:
-       DS(model, denoiser, encoder, decoder, test_loader, args.mode, logfilename)
+       DS(model, denoiser, encoder, decoder, test_loader, args.mode)
             
 if __name__ == "__main__":
     main()
