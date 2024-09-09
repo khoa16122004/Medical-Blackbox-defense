@@ -51,7 +51,8 @@ DENOISERS_ARCHITECTURES = ["cifar_dncnn", "mnist_dncnn", "cifar_dncnn_wide", "me
                            'stl10_dncnn'
                         ]
 
-AUTOENCODER_ARCHITECTURES = ['Encoder_Vit_1000', 'Decoder_Vit_1000'
+AUTOENCODER_ARCHITECTURES = ['Sadnet_Encoder', 'Sadnet_Decoder',
+                             'Encoder_Vit_1000', 'Decoder_Vit_1000'
                              'Encoder_1000', 'Decoder_1000',
                              'Custom_Encoder_256', 'Custom_Decoder_256',
                              'Encoder_768', 'Decoder_768',
@@ -88,7 +89,14 @@ def get_architecture(arch: str, dataset: str, pytorch_pretrained: bool=False) ->
     
     
     
-    print(arch)
+    if arch == "Sadnet_Encoder":
+        return Sadnet_Encoder().cuda()
+    
+    if arch == "Sadnet_Decoder":
+        return Sadnet_Decoder().cuda()
+    
+    
+
     if arch == "cass_classifier" and dataset in ["Brain_Tumor", "Brain_Tumor_Noise"]:
         return torch.load("new_cnn_brain_cass.pt", map_location=torch.device("cuda:0"))
 

@@ -174,26 +174,22 @@ def main():
 
     # b) AutoEncoder
     if args.model_type == 'AE_DS':
-        if args.pretrained_encoder:
-            # checkpoint = torch.load(args.pretrained_encoder)
-            # assert checkpoint['arch'] == args.encoder_arch
-            # encoder = get_architecture(checkpoint['arch'], args.dataset)
-            # encoder.load_state_dict(checkpoint['state_dict'])
-            encoder = torch.load(args.pretrained_encoder)
-            print(f"Using pretrained encoder")
-        else:
-            encoder = get_architecture(args.encoder_arch, args.dataset)
+        encoder = get_architecture(args.encoder_arch, args.dataset)
+        encoder.load_state_dict(torch(args.pretrained_encoder))
+        print(f"Using pretrained encoder")
 
-        if args.pretrained_decoder:
-            # checkpoint = torch.load(args.pretrained_decoder)
-            # assert checkpoint['arch'] == args.decoder_arch
-            # decoder = get_architecture(checkpoint['arch'], args.dataset)
-            # decoder.load_state_dict(checkpoint['state_dict'])
-            decoder = torch.load(args.pretrained_decoder)
-            print(f"Using pretrained decoder")
+        decoder = get_architecture(args.decoder_arch, args.dataset)
+        decoder.load_state_dict(torch(args.pretrained_decoder))
+            
+        # if args.pretrained_decoder:
+        #     # checkpoint = torch.load(args.pretrained_decoder)
+        #     # assert checkpoint['arch'] == args.decoder_arch
+        #     # decoder = get_architecture(checkpoint['arch'], args.dataset)
+        #     # decoder.load_state_dict(checkpoint['state_dict'])
+        #     decoder = torch.load(args.pretrained_decoder)
+        #     print(f"Using pretrained decoder")
 
-        else:
-            decoder = get_architecture(args.decoder_arch, args.dataset)
+
 
     # c) Classifier / Reconstructor
     if args.train_objective == "classification":
@@ -617,7 +613,10 @@ def train_ae(loader: DataLoader, encoder: torch.nn.Module, decoder: torch.nn.Mod
         noise = torch.randn_like(inputs, device='cuda') * noise_sd
 
         recon = denoiser(inputs + noise)
-        recon = encoder(recon)
+        if args.encoder_arg == "Sadnet_Encoder":
+            recon, l = encoder(recon)
+        else:
+            recon = encoder(recon)
 
         if args.optimization_method == 'FO':
             recon = decoder(recon)
@@ -646,8 +645,12 @@ def train_ae(loader: DataLoader, encoder: torch.nn.Module, decoder: torch.nn.Mod
 
                     # Forward Inference (Original)
                     original_pre = classifier(inputs).argmax(1).detach().clone()
+                    
+                    if args.encoder_arch == "Sadnet_Encoder":
+                        recon_pre = classifier(decoder(recon, l))
+                    else:
+                        recon_pre = classifier(decoder(recon))
 
-                    recon_pre = classifier(decoder(recon))
                     loss_0 = criterion(recon_pre, original_pre)
 
                     # record original loss
@@ -667,7 +670,10 @@ def train_ae(loader: DataLoader, encoder: torch.nn.Module, decoder: torch.nn.Mod
                         # Forward Inference (reconstructed image + random direction vector)
                         recon_q = recon_flat_no_grad + mu * u
                         recon_q = recon_q.view(batch_size, channel, h, w)
-                        recon_q_pre = classifier(decoder(recon_q))
+                        if args.encoder_arch == "Sadnet_Encoder":
+                            recon_pre = classifier(decoder(recon_q, l))
+                        else:
+                            recon_q_pre = classifier(decoder(recon_q))
 
                         # Loss Calculation and Gradient Estimation
                         loss_tmp = criterion(recon_q_pre, original_pre)
@@ -825,8 +831,12 @@ def test_with_classifier_ae(loader: DataLoader, encoder: torch.nn.Module, decode
             if denoiser is not None:
                 inputs = denoiser(inputs)
             # compute output
-            outputs = encoder(inputs)
-            outputs = decoder(outputs)
+            if args.encode_arch == "Sadnet_Encoder":
+                outputs, l = encoder(inputs)
+                outputs = decoder(outputs, l)
+            else:
+                outputs = encoder(inputs)
+                outputs = decoder(outputs)
             outputs = classifier(outputs)
             loss = criterion(outputs, targets)
             loss_mean = loss.mean()
