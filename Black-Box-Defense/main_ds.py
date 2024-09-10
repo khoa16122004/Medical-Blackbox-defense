@@ -35,7 +35,7 @@ parser.add_argument('--dataset', type=str, default="Brain_Tumor", choices=DATASE
 parser.add_argument('--data_min', default=-2.5090184, type=float, help='minimum value of training data')
 parser.add_argument('--data_max', default=3.3369503, type=float, help='maximum value of training data')
 
-parser.add_argument('--batch', default=2, type=int, metavar='N', help='batchsize (default: 256)')
+parser.add_argument('--batch', default=13, type=int, metavar='N', help='batchsize (default: 256)')
 parser.add_argument('--measurement', default=576, type=int, metavar='N', help='the size of measurement for image reconstruction')
 
 
@@ -175,11 +175,11 @@ def main():
     # b) AutoEncoder
     if args.model_type == 'AE_DS':
         encoder = get_architecture(args.encoder_arch, args.dataset)
-        encoder.load_state_dict(torch(args.pretrained_encoder))
+        encoder.load_state_dict(torch.load(args.pretrained_encoder))
         print(f"Using pretrained encoder")
 
         decoder = get_architecture(args.decoder_arch, args.dataset)
-        decoder.load_state_dict(torch(args.pretrained_decoder))
+        decoder.load_state_dict(torch.load(args.pretrained_decoder))
             
         # if args.pretrained_decoder:
         #     # checkpoint = torch.load(args.pretrained_decoder)
@@ -613,7 +613,7 @@ def train_ae(loader: DataLoader, encoder: torch.nn.Module, decoder: torch.nn.Mod
         noise = torch.randn_like(inputs, device='cuda') * noise_sd
 
         recon = denoiser(inputs + noise)
-        if args.encoder_arg == "Sadnet_Encoder":
+        if args.encoder_arch == "Sadnet_Encoder":
             recon, l = encoder(recon)
         else:
             recon = encoder(recon)
@@ -652,7 +652,7 @@ def train_ae(loader: DataLoader, encoder: torch.nn.Module, decoder: torch.nn.Mod
                         recon_pre = classifier(decoder(recon))
 
                     loss_0 = criterion(recon_pre, original_pre)
-
+                    input()
                     # record original loss
                     loss_0_mean = loss_0.mean()
                     losses.update(loss_0_mean.item(), inputs.size(0))
@@ -671,10 +671,9 @@ def train_ae(loader: DataLoader, encoder: torch.nn.Module, decoder: torch.nn.Mod
                         recon_q = recon_flat_no_grad + mu * u
                         recon_q = recon_q.view(batch_size, channel, h, w)
                         if args.encoder_arch == "Sadnet_Encoder":
-                            recon_pre = classifier(decoder(recon_q, l))
+                            recon_q_pre = classifier(decoder(recon_q, l))
                         else:
                             recon_q_pre = classifier(decoder(recon_q))
-
                         # Loss Calculation and Gradient Estimation
                         loss_tmp = criterion(recon_q_pre, original_pre)
                         loss_diff = torch.tensor(loss_tmp - loss_0)

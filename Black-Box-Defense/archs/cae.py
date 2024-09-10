@@ -80,20 +80,23 @@ class ModulatedDeformableConv2d(nn.Module):
 
 
     def forward(self, x):
-
         if self.extra_offset_mask:
             # x = [input, features]
             offset_mask = self.conv_offset_mask(x[1])
             x = x[0]
+
         else:
             offset_mask = self.conv_offset_mask(x)
+
+            
         o1, o2, mask = torch.chunk(offset_mask, 3, dim=1)
         offset = torch.cat((o1, o2), dim=1)
         mask = torch.sigmoid(mask)
 
         offset_mean = torch.mean(torch.abs(offset))
-        if offset_mean > max(x.shape[2:]):
-            logger.warning('Offset mean is {}, larger than max(h, w).'.format(offset_mean))
+        # if offset_mean > max(x.shape[2:]):
+        #     print(x.shape)
+        #     logger.warning('Offset mean is {}, larger than max(h, w).'.format(offset_mean))
 
         out = deform_conv2d(input=x,
                             offset=offset,
