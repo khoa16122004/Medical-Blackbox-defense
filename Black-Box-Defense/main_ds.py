@@ -652,7 +652,6 @@ def train_ae(loader: DataLoader, encoder: torch.nn.Module, decoder: torch.nn.Mod
                         recon_pre = classifier(decoder(recon))
 
                     loss_0 = criterion(recon_pre, original_pre)
-                    input()
                     # record original loss
                     loss_0_mean = loss_0.mean()
                     losses.update(loss_0_mean.item(), inputs.size(0))
@@ -830,7 +829,7 @@ def test_with_classifier_ae(loader: DataLoader, encoder: torch.nn.Module, decode
             if denoiser is not None:
                 inputs = denoiser(inputs)
             # compute output
-            if args.encode_arch == "Sadnet_Encoder":
+            if args.encoder_arch == "Sadnet_Encoder":
                 outputs, l = encoder(inputs)
                 outputs = decoder(outputs, l)
             else:
